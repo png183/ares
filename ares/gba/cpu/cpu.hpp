@@ -214,10 +214,10 @@ struct CPU : ARM7TDMI, Thread, IO {
   } memory;
 
   struct {
-    auto next() const { return baseAddr + buffer.size() * 2; }
+    auto next() const { return addr + buffer.size() * 2; }
 
     queue<n16[8]> buffer;
-    n32 baseAddr;
+    n32 addr;  //read location of prefetch buffer
     i32 wait = 1;  //number of clocks before next slot load
   } prefetch;
 

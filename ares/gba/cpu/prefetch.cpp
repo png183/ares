@@ -1,7 +1,7 @@
 auto CPU::prefetchSync(n32 address) -> void {
-  if(address == prefetch.baseAddr) return;
+  if(address == prefetch.addr) return;
 
-  prefetch.baseAddr = address;
+  prefetch.addr = address;
   prefetch.wait = _wait(Half | Nonsequential, prefetch.next());
   prefetch.buffer.flush();
 }
@@ -31,6 +31,6 @@ auto CPU::prefetchRead() -> n16 {
   if(prefetch.buffer.full()) prefetch.wait = _wait(Half | Sequential, prefetch.next());
 
   n16 half = prefetch.buffer.read(0);
-  prefetch.baseAddr += 2;
+  prefetch.addr += 2;
   return half;
 }
