@@ -94,9 +94,8 @@ auto CPU::serialize(serializer& s) -> void {
   s(memory.ewramWait);
   s(memory.unknown2);
 
-  s(prefetch.slot);
-  s(prefetch.addr);
-  s(prefetch.load);
+  s(prefetch.buffer);
+  s(prefetch.baseAddr);
   s(prefetch.wait);
 
   s(context.clock);

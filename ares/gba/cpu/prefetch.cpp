@@ -1,37 +1,36 @@
 auto CPU::prefetchSync(n32 address) -> void {
-  if(address == prefetch.addr) return;
+  if(address == prefetch.baseAddr) return;
 
-  prefetch.addr = address;
-  prefetch.load = address;
-  prefetch.wait = _wait(Half | Nonsequential, prefetch.load);
+  prefetch.baseAddr = address;
+  prefetch.wait = _wait(Half | Nonsequential, prefetch.next());
+  prefetch.buffer.flush();
 }
 
 auto CPU::prefetchStep(u32 clocks) -> void {
   step(clocks);
   if(!wait.prefetch || context.dmaActive) return;
 
-  while(!prefetch.full() && clocks--) {
+  while(!prefetch.buffer.full() && clocks--) {
     if(--prefetch.wait) continue;
-    prefetch.slot[prefetch.load >> 1 & 7] = cartridge.read(Half, prefetch.load);
-    prefetch.load += 2;
-    prefetch.wait = _wait(Half | Sequential, prefetch.load);
+    prefetch.buffer.write(cartridge.read(Half, prefetch.next()));
+    prefetch.wait = _wait(Half | Sequential, prefetch.next());
   }
 }
 
 auto CPU::prefetchWait() -> void {
-  if(!wait.prefetch || context.dmaActive || prefetch.full()) return;
+  if(!wait.prefetch || context.dmaActive || prefetch.buffer.full()) return;
 
   prefetchStep(prefetch.wait);
-  prefetch.wait = _wait(Half | Nonsequential, prefetch.load);
+  prefetch.wait = _wait(Half | Nonsequential, prefetch.next());
 }
 
 auto CPU::prefetchRead() -> n16 {
-  if(prefetch.empty()) prefetchStep(prefetch.wait);
+  if(prefetch.buffer.empty()) prefetchStep(prefetch.wait);
   else prefetchStep(1);
 
-  if(prefetch.full()) prefetch.wait = _wait(Half | Sequential, prefetch.load);
+  if(prefetch.buffer.full()) prefetch.wait = _wait(Half | Sequential, prefetch.next());
 
-  n16 half = prefetch.slot[prefetch.addr >> 1 & 7];
-  prefetch.addr += 2;
+  n16 half = prefetch.buffer.read(0);
+  prefetch.baseAddr += 2;
   return half;
 }
