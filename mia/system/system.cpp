@@ -33,6 +33,7 @@ namespace Systems {
   #include "pocket-challenge-v2.cpp"
   #include "zx-spectrum.cpp"
   #include "zx-spectrum-128.cpp"
+  #include "base6502.cpp"
 }
 
 auto System::create(string name) -> shared_pointer<Pak> {
@@ -70,6 +71,7 @@ auto System::create(string name) -> shared_pointer<Pak> {
   if(name == "Pocket Challenge V2") return new Systems::PocketChallengeV2;
   if(name == "ZX Spectrum") return new Systems::ZXSpectrum;
   if(name == "ZX Spectrum 128") return new Systems::ZXSpectrum128;
+  if(name == "Base6502") return new Systems::Base6502;
   return {};
 }
 

@@ -153,6 +153,13 @@ namespace ares::ZXSpectrum {
   #include "zx-spectrum-128.cpp"
 #endif
 
+#ifdef CORE_BASE6502
+  namespace ares::Base6502 {
+    auto load(Node::System& node, string name) -> bool;
+  }
+  #include "base6502.cpp"
+#endif
+
 #include "arcade.cpp"
 
 auto Emulator::construct() -> void {
@@ -248,5 +255,9 @@ auto Emulator::construct() -> void {
   #ifdef CORE_SPEC
   emulators.append(new ZXSpectrum);
   emulators.append(new ZXSpectrum128);
+  #endif
+
+  #ifdef CORE_BASE6502
+  emulators.append(new Base6502);
   #endif
 }

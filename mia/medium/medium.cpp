@@ -36,6 +36,7 @@ namespace Media {
   #include "wonderswan-color.cpp"
   #include "pocket-challenge-v2.cpp"
   #include "zx-spectrum.cpp"
+  #include "base6502.cpp"
 }
 
 //auto Medium::construct() -> void {
@@ -79,6 +80,7 @@ auto Medium::create(string name) -> shared_pointer<Pak> {
   if(name == "WonderSwan Color") return new Media::WonderSwanColor;
   if(name == "Pocket Challenge V2") return new Media::PocketChallengeV2;
   if(name == "ZX Spectrum") return new Media::ZXSpectrum;
+  if(name == "Base6502") return new Media::Base6502;
   return {};
 }
 

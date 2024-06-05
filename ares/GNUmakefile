@@ -101,6 +101,10 @@ ifneq ($(filter $(cores),spec),)
   include $(ares.path)/spec/GNUmakefile
 endif
 
+ifneq ($(filter $(cores),base6502),)
+  include $(ares.path)/base6502/GNUmakefile
+endif
+
 include $(ares.path)/component/GNUmakefile
 
 flags += $(foreach c,$(call strupper,$(cores)),-DCORE_$c)

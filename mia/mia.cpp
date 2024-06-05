@@ -107,6 +107,7 @@ auto construct() -> void {
   media.append("WonderSwan");
   media.append("WonderSwan Color");
   media.append("ZX Spectrum");
+  media.append("Base6502");
 }
 
 auto identify(const string& filename) -> string {
