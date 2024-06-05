@@ -5,6 +5,11 @@
 **ares** is a multi-system emulator that began development on October 14th, 2004.
 It is a descendant of [higan](https://github.com/higan-emu/higan) and [bsnes](https://github.com/bsnes-emu/bsnes/), and focuses on accuracy and preservation.
 
+Branch Info
+-----------
+
+This branch adds a barebones 6502-based system (derived from a significantly stripped-down copy of the NES core), with 32KiB RAM and 32KiB ROM, that runs 6502 programs with `.bin` extensions. This is intended to provide a nice base to build off when adding new systems.
+
 Official Releases
 -----------------
 
