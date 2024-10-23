@@ -48,7 +48,41 @@ auto ARM7TDMI::MUL(n32 product, n32 multiplicand, n32 multiplier) -> n32 {
   if(multiplier >>  8 && multiplier >>  8 != 0xffffff) idle();
   if(multiplier >> 16 && multiplier >> 16 !=   0xffff) idle();
   if(multiplier >> 24 && multiplier >> 24 !=     0xff) idle();
-  product += multiplicand * multiplier;
+
+
+
+  n32 reference = multiplicand * multiplier;
+
+  //WIP: multiplier internal algorithm
+  n32 output = 0;
+  for(auto i : range(16)) {
+    n3 block = ((n33)multiplier << 1) >> (2 * i);
+    n32 partialProduct = multiplicand;
+    switch(block) {
+    case 0: partialProduct  =  0; break;
+    case 1:                       break;
+    case 2:                       break;
+    case 3: partialProduct *=  2; break;
+    case 4: partialProduct *= -2; break;
+    case 5: partialProduct *= -1; break;
+    case 6: partialProduct *= -1; break;
+    case 7: partialProduct  =  0; break;
+    }
+    partialProduct <<= 2 * i;
+    output += partialProduct;
+  }
+
+
+
+  //check that algorithm produces correct output
+  if(reference != output) printf("ERROR: 0x%08x x 0x%08x != 0x%08x (expected 0x%08x)\n", multiplicand, multiplier, output, reference);
+
+
+
+  product += reference;
+
+
+
   if(cpsr().t || opcode.bit(20)) {
     cpsr().z = product == 0;
     cpsr().n = product.bit(31);
