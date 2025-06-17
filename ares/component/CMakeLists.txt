@@ -237,6 +237,21 @@ component_sources(
 
 component_sources(
   COMPONENT
+    s1c88
+  PRIMARY
+    processor/s1c88/s1c88.cpp
+  INCLUDED
+    processor/s1c88/algorithms.cpp
+    processor/s1c88/disassembler.cpp
+    processor/s1c88/instruction.cpp
+    processor/s1c88/instructions.cpp
+    processor/s1c88/memory.cpp
+    processor/s1c88/s1c88.hpp
+    processor/s1c88/registers.hpp
+)
+
+component_sources(
+  COMPONENT
     mos6502
   PRIMARY
     processor/mos6502/mos6502.cpp

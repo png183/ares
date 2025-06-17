@@ -1,0 +1,15 @@
+#define BA ba.word
+#define HL hl.word
+#define IP ip.word
+
+#define A  ba.byte.lo
+#define B  ba.byte.hi
+#define L  hl.byte.lo
+#define H  hl.byte.hi
+#define YP ip.byte.lo
+#define XP ip.byte.hi
+
+#define ZF SC.bit(0)
+#define CF SC.bit(1)
+#define VF SC.bit(2)
+#define NF SC.bit(3)
