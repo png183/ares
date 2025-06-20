@@ -1,3 +1,21 @@
+auto S1C88::ADD(n8 x, n8 y) -> n8 {
+  n9 z = x + y;
+  ZF = n8(z) == 0;
+  CF = z.bit(8);
+  VF = n8(~(x ^ y) & (x ^ z)).bit(7);
+  NF = z.bit(7);
+  return z;
+}
+
+auto S1C88::ADD16(n16 x, n16 y) -> n16 {
+  n17 z = x + y;
+  ZF = n16(z) == 0;
+  CF = z.bit(16);
+  VF = n16(~(x ^ y) & (x ^ z)).bit(15);
+  NF = z.bit(15);
+  return z;
+}
+
 auto S1C88::AND(n8 x, n8 y) -> n8 {
   n8 z = x & y;
   ZF = z == 0;
@@ -85,6 +103,14 @@ auto S1C88::SRA(n8 x) -> n8 {
   ZF = x == 0;
   VF = 0;
   NF = x.bit(7);
+  return x;
+}
+
+auto S1C88::SRL(n8 x) -> n8 {
+  CF = x.bit(0);
+  x = x >> 1;
+  ZF = x == 0;
+  NF = 0;
   return x;
 }
 

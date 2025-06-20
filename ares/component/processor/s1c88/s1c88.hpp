@@ -21,6 +21,9 @@ struct S1C88 {
   auto write16(n24 address, n16 data) -> void;
 
   //algorithms.cpp
+  //todo: support U and D status bits
+  auto ADD(n8 x, n8 y) -> n8;
+  auto ADD16(n16 x, n16 y) -> n16;
   auto AND(n8 x, n8 y) -> n8;
   auto CPL(n8 x) -> n8;
   auto DEC(n8 x) -> n8;
@@ -33,6 +36,7 @@ struct S1C88 {
   auto RRC(n8 x) -> n8;
   auto SLL(n8 x) -> n8;
   auto SRA(n8 x) -> n8;
+  auto SRL(n8 x) -> n8;
   auto XOR(n8 x, n8 y) -> n8;
 
   //instruction.cpp
@@ -42,10 +46,13 @@ struct S1C88 {
   auto instructionCF(n8 opcode) -> void;
 
   //instructions.cpp
-  //todo: remove base field from _ir instructions since they all use BR
+  auto instructionADD_r_n(n8& dst) -> void;
+  auto instructionADD_r_r(n8& dst, n8& src) -> void;
+  auto instructionADD_rr_nn(n16& dst) -> void;
+  auto instructionADD_rr_rr(n16& dst, n16& src) -> void;
   auto instructionAND_r_n(n8& dst) -> void;
-  auto instructionAND_ir_n(n8& base) -> void;
-  auto instructionBIT_ir_n(n8& base) -> void;
+  auto instructionAND_ir_n() -> void;
+  auto instructionBIT_ir_n() -> void;
   auto instructionBIT_r_n(n8& dst) -> void;
   auto instructionCARL() -> void;
   auto instructionCPL_r(n8& dst) -> void;
@@ -60,14 +67,15 @@ struct S1C88 {
   auto instructionJRS_c_n(bool cond) -> void;
   auto instructionLD_inn_r(n8& src) -> void;
   auto instructionLD_inn_rr(n16& src) -> void;
-  auto instructionLD_ir_n(n8& base) -> void;
-  auto instructionLD_ir_r(n8& base, n8& src) -> void;
+  auto instructionLD_ir_irr(n16& index, n8& page) -> void;
+  auto instructionLD_ir_n() -> void;
+  auto instructionLD_ir_r(n8& src) -> void;
   auto instructionLD_irr_irr(n16& dindex, n8& dpage, n16& sindex, n8& spage) -> void;
   auto instructionLD_irr_n(n16& index, n8& page) -> void;
   auto instructionLD_irr_r(n16& index, n8& page, n8& src) -> void;
   auto instructionLD_irr_rr(n16& index, n8& page, n16& src) -> void;
   auto instructionLD_irrpr_r(n16& index, n8& page, n8& dst, n8& src) -> void;
-  auto instructionLD_r_ir(n8& dst, n8& base) -> void;
+  auto instructionLD_r_ir(n8& dst) -> void;
   auto instructionLD_r_irr(n8& dst, n16& index, n8& page) -> void;
   auto instructionLD_r_irrpn(n8& dst, n16& index, n8& page) -> void;
   auto instructionLD_r_inn(n8& dst) -> void;
@@ -79,7 +87,8 @@ struct S1C88 {
   auto instructionLD_r_irrpr(n8& dst, n16& index, n8& page, n8& src) -> void;
   auto instructionLD_rr_nn(n16& dst) -> void;
   auto instructionLD_rr_rr(n16& dst, n16& src) -> void;
-  auto instructionOR_ir_n(n8& base) -> void;
+  auto instructionNOP() -> void;
+  auto instructionOR_ir_n() -> void;
   auto instructionPOP_r(n8& dst) -> void;
   auto instructionPOP_rr(n16& dst) -> void;
   auto instructionPUSH_all() -> void;
@@ -91,6 +100,7 @@ struct S1C88 {
   auto instructionRRC_r(n8& dst) -> void;
   auto instructionSLL_r(n8& dst) -> void;
   auto instructionSRA_r(n8& dst) -> void;
+  auto instructionSRL_r(n8& dst) -> void;
   auto instructionXOR_r_r(n8& dst, n8& src) -> void;
 
   //disassembler.cpp

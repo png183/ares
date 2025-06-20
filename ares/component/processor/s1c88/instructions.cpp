@@ -1,16 +1,32 @@
+auto S1C88::instructionADD_r_n(n8& dst) -> void {
+  dst = ADD(dst, fetch());
+}
+
+auto S1C88::instructionADD_r_r(n8& dst, n8& src) -> void {
+  dst = ADD(dst, src);
+}
+
+auto S1C88::instructionADD_rr_nn(n16& dst) -> void {
+  dst = ADD16(dst, fetch16());
+}
+
+auto S1C88::instructionADD_rr_rr(n16& dst, n16& src) -> void {
+  dst = ADD16(dst, src);
+}
+
 auto S1C88::instructionAND_r_n(n8& dst) -> void {
   dst = AND(dst, fetch());
 }
 
-auto S1C88::instructionAND_ir_n(n8& base) -> void {
-  n24 address = EP << 16 | base << 8 | fetch();
+auto S1C88::instructionAND_ir_n() -> void {
+  n24 address = EP << 16 | BR << 8 | fetch();
   n8 x = read(address);
   n8 y = fetch();
   write(address, AND(x, y));
 }
 
-auto S1C88::instructionBIT_ir_n(n8& base) -> void {
-  n24 address = EP << 16 | base << 8 | fetch();
+auto S1C88::instructionBIT_ir_n() -> void {
+  n24 address = EP << 16 | BR << 8 | fetch();
   n8 x = read(address);
   n8 y = fetch();
   AND(x, y);
@@ -102,13 +118,19 @@ auto S1C88::instructionLD_inn_rr(n16& src) -> void {
   write16(address, src);
 }
 
-auto S1C88::instructionLD_ir_n(n8& base) -> void {
-  n24 address = EP << 16 | base << 8 | fetch();
+auto S1C88::instructionLD_ir_irr(n16& index, n8& page) -> void {
+  n24 daddr = EP << 16 | BR << 8 | fetch();
+  n24 saddr = page << 16 | index;
+  write(daddr, read(saddr));
+}
+
+auto S1C88::instructionLD_ir_n() -> void {
+  n24 address = EP << 16 | BR << 8 | fetch();
   write(address, fetch());
 }
 
-auto S1C88::instructionLD_ir_r(n8& base, n8& src) -> void {
-  n24 address = EP << 16 | base << 8 | fetch();
+auto S1C88::instructionLD_ir_r(n8& src) -> void {
+  n24 address = EP << 16 | BR << 8 | fetch();
   write(address, src);
 }
 
@@ -140,8 +162,8 @@ auto S1C88::instructionLD_irrpr_r(n16& index, n8& page, n8& dst, n8& src) -> voi
   write(address, src);
 }
 
-auto S1C88::instructionLD_r_ir(n8& dst, n8& base) -> void {
-  n24 address = EP << 16 | base << 8 | fetch();
+auto S1C88::instructionLD_r_ir(n8& dst) -> void {
+  n24 address = EP << 16 | BR << 8 | fetch();
   dst = read(address);
 }
 
@@ -202,11 +224,15 @@ auto S1C88::instructionLD_rr_rr(n16& dst, n16& src) -> void {
   dst = src;
 }
 
-auto S1C88::instructionOR_ir_n(n8& base) -> void {
-  n24 address = EP << 16 | base << 8 | fetch();
+auto S1C88::instructionOR_ir_n() -> void {
+  n24 address = EP << 16 | BR << 8 | fetch();
   n8 x = read(address);
   n8 y = fetch();
   write(address, OR(x, y));
+}
+
+auto S1C88::instructionNOP() -> void {
+  //no operation
 }
 
 auto S1C88::instructionPOP_r(n8& dst) -> void {
@@ -257,6 +283,10 @@ auto S1C88::instructionSLL_r(n8& dst) -> void {
 
 auto S1C88::instructionSRA_r(n8& dst) -> void {
   dst = SRA(dst);
+}
+
+auto S1C88::instructionSRL_r(n8& dst) -> void {
+  dst = SRL(dst);
 }
 
 auto S1C88::instructionXOR_r_r(n8& dst, n8& src) -> void {
