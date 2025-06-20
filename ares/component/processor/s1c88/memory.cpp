@@ -1,5 +1,6 @@
 auto S1C88::pop() -> n8 {
-  n8 data = read(SP);
+  n24 address = SPP << 16 | SP;
+  n8 data = read(address);
   SP++;
   return data;
 }
@@ -12,7 +13,8 @@ auto S1C88::pop16() -> n16 {
 
 auto S1C88::push(n8 data) -> void {
   SP--;
-  write(SP, data);  //todo: allow setting SP upper 8 bits on a per-implementation basis?
+  n24 address = SPP << 16 | SP;
+  write(address, data);
 }
 
 auto S1C88::push16(n16 data) -> void {

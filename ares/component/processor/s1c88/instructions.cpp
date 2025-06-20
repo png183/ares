@@ -9,6 +9,13 @@ auto S1C88::instructionAND_ir_n(n8& base) -> void {
   write(address, AND(x, y));
 }
 
+auto S1C88::instructionBIT_ir_n(n8& base) -> void {
+  n24 address = EP << 16 | base << 8 | fetch();
+  n8 x = read(address);
+  n8 y = fetch();
+  AND(x, y);
+}
+
 auto S1C88::instructionBIT_r_n(n8& dst) -> void {
   AND(dst, fetch());
 }
@@ -19,6 +26,10 @@ auto S1C88::instructionCARL() -> void {
   push16(PC);
   PC += offset - 1;
   CB = NB;
+}
+
+auto S1C88::instructionCPL_r(n8& dst) -> void {
+  dst = CPL(dst);
 }
 
 auto S1C88::instructionDEC_r(n8& dst) -> void {
@@ -122,8 +133,34 @@ auto S1C88::instructionLD_irr_rr(n16& index, n8& page, n16& src) -> void {
   write16(address, src);
 }
 
+auto S1C88::instructionLD_irrpr_r(n16& index, n8& page, n8& dst, n8& src) -> void {
+  //todo: may have a page wrapping bug?
+  s8 offset = dst;
+  n24 address = page << 16 | (index + offset);
+  write(address, src);
+}
+
+auto S1C88::instructionLD_r_ir(n8& dst, n8& base) -> void {
+  n24 address = EP << 16 | base << 8 | fetch();
+  dst = read(address);
+}
+
 auto S1C88::instructionLD_r_irr(n8& dst, n16& index, n8& page) -> void {
   n24 address = page << 16 | index;
+  dst = read(address);
+}
+
+auto S1C88::instructionLD_r_irrpn(n8& dst, n16& index, n8& page) -> void {
+  //todo: may have a page wrapping bug?
+  s8 offset = fetch();
+  n24 address = page << 16 | (index + offset);
+  dst = read(address);
+}
+
+auto S1C88::instructionLD_r_irrpr(n8& dst, n16& index, n8& page, n8& src) -> void {
+  //todo: may have a page wrapping bug?
+  s8 offset = src;
+  n24 address = page << 16 | (index + offset);
   dst = read(address);
 }
 
@@ -147,6 +184,13 @@ auto S1C88::instructionLD_rr_inn(n16& dst) -> void {
 
 auto S1C88::instructionLD_rr_irr(n16& dst, n16& index, n8& page) -> void {
   n24 address = EP << 16 | index;
+  dst = read16(address);
+}
+
+auto S1C88::instructionLD_rr_irrpn(n16& dst, n16& index, n8& page) -> void {
+  //todo: may have a page wrapping bug?
+  s8 offset = fetch();
+  n24 address = page << 16 | (index + offset);
   dst = read16(address);
 }
 
@@ -193,6 +237,18 @@ auto S1C88::instructionRET() -> void {
   PC = pop16();
   CB = pop();
   NB = CB;
+}
+
+auto S1C88::instructionRL_r(n8& dst) -> void {
+  dst = RL(dst);
+}
+
+auto S1C88::instructionRLC_r(n8& dst) -> void {
+  dst = RLC(dst);
+}
+
+auto S1C88::instructionRRC_r(n8& dst) -> void {
+  dst = RRC(dst);
 }
 
 auto S1C88::instructionSLL_r(n8& dst) -> void {

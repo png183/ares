@@ -5,6 +5,13 @@ auto S1C88::AND(n8 x, n8 y) -> n8 {
   return z;
 }
 
+auto S1C88::CPL(n8 x) -> n8 {
+  x = ~x;
+  ZF = x == 0;
+  NF = x.bit(7);
+  return x;
+}
+
 auto S1C88::DEC(n8 x) -> n8 {
   x--;
   ZF = x == 0;
@@ -34,6 +41,34 @@ auto S1C88::OR(n8 x, n8 y) -> n8 {
   ZF = z == 0;
   NF = z.bit(7);
   return z;
+}
+
+auto S1C88::RL(n8 x) -> n8 {
+  n1 oldCarry = CF;
+  CF = x.bit(7);
+  x <<= 1;
+  x.bit(0) = oldCarry;
+  ZF = x == 0;
+  NF = x.bit(7);
+  return x;
+}
+
+auto S1C88::RLC(n8 x) -> n8 {
+  CF = x.bit(7);
+  x <<= 1;
+  x.bit(0) = CF;
+  ZF = x == 0;
+  NF = x.bit(7);
+  return x;
+}
+
+auto S1C88::RRC(n8 x) -> n8 {
+  CF = x.bit(0);
+  x >>= 1;
+  x.bit(7) = CF;
+  ZF = x == 0;
+  NF = x.bit(7);
+  return x;
 }
 
 auto S1C88::SLL(n8 x) -> n8 {
