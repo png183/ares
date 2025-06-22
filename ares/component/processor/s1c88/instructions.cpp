@@ -14,15 +14,24 @@ auto S1C88::instructionADD_rr_rr(n16& dst, n16& src) -> void {
   dst = ADD16(dst, src);
 }
 
-auto S1C88::instructionAND_r_n(n8& dst) -> void {
-  dst = AND(dst, fetch());
-}
-
 auto S1C88::instructionAND_ir_n() -> void {
   n24 address = EP << 16 | BR << 8 | fetch();
   n8 x = read(address);
   n8 y = fetch();
   write(address, AND(x, y));
+}
+
+auto S1C88::instructionAND_r_irr(n8& dst, n16& index, n8& page) -> void {
+  n24 address = page << 16 | index;
+  dst = AND(dst, read(address));
+}
+
+auto S1C88::instructionAND_r_n(n8& dst) -> void {
+  dst = AND(dst, fetch());
+}
+
+auto S1C88::instructionAND_r_r(n8& dst, n8& src) -> void {
+  dst = AND(dst, src);
 }
 
 auto S1C88::instructionBIT_ir_n() -> void {
@@ -42,6 +51,33 @@ auto S1C88::instructionCARL() -> void {
   push16(PC);
   PC += offset - 1;
   CB = NB;
+}
+
+auto S1C88::instructionCP_irr_n(n16& index, n8& page) -> void {
+  n24 address = page << 16 | index;
+  n8 dst = read(address);
+  SUB(dst, fetch());
+}
+
+auto S1C88::instructionCP_r_irr(n8& dst, n16& index, n8& page) -> void {
+  n24 address = page << 16 | index;
+  SUB(dst, read(address));
+}
+
+auto S1C88::instructionCP_r_n(n8& dst) -> void {
+  SUB(dst, fetch());
+}
+
+auto S1C88::instructionCP_r_r(n8& dst, n8& src) -> void {
+  SUB(dst, src);
+}
+
+auto S1C88::instructionCP_rr_nn(n16& dst) -> void {
+  SUB16(dst, fetch16());
+}
+
+auto S1C88::instructionCP_rr_rr(n16& dst, n16& src) -> void {
+  SUB16(dst, src);
 }
 
 auto S1C88::instructionCPL_r(n8& dst) -> void {
@@ -237,6 +273,14 @@ auto S1C88::instructionOR_ir_n() -> void {
   write(address, OR(x, y));
 }
 
+auto S1C88::instructionOR_r_n(n8& dst) -> void {
+  dst = OR(dst, fetch());
+}
+
+auto S1C88::instructionOR_r_r(n8& dst, n8& src) -> void {
+  dst = OR(dst, src);
+}
+
 auto S1C88::instructionNOP() -> void {
   //no operation
 }
@@ -255,6 +299,16 @@ auto S1C88::instructionPOP_r(n8& dst) -> void {
 
 auto S1C88::instructionPOP_rr(n16& dst) -> void {
   dst = pop16();
+}
+
+auto S1C88::instructionPUSH_ale() -> void {
+  push16(BA);
+  push16(HL);
+  push16(IX);
+  push16(IY);
+  push(BR);
+  push(EP);
+  push16(IP);
 }
 
 auto S1C88::instructionPUSH_all() -> void {
@@ -301,6 +355,10 @@ auto S1C88::instructionSRA_r(n8& dst) -> void {
 
 auto S1C88::instructionSRL_r(n8& dst) -> void {
   dst = SRL(dst);
+}
+
+auto S1C88::instructionSUB_r_n(n8& dst) -> void {
+  dst = SUB(dst, fetch());
 }
 
 auto S1C88::instructionSUB_r_r(n8& dst, n8& src) -> void {
