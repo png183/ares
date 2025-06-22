@@ -114,6 +114,24 @@ auto S1C88::SRL(n8 x) -> n8 {
   return x;
 }
 
+auto S1C88::SUB(n8 x, n8 y) -> n8 {
+  n9 z = x - y;
+  ZF = n8(z) == 0;
+  CF = z.bit(8);
+  VF = n8((x ^ y) & (x ^ z)).bit(7);
+  NF = z.bit(7);
+  return z;
+}
+
+auto S1C88::SUB16(n16 x, n16 y) -> n16 {
+  n17 z = x - y;
+  ZF = n16(z) == 0;
+  CF = z.bit(16);
+  VF = n16((x ^ y) & (x ^ z)).bit(15);
+  NF = z.bit(15);
+  return z;
+}
+
 auto S1C88::XOR(n8 x, n8 y) -> n8 {
   n8 z = x ^ y;
   ZF = z == 0;

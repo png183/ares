@@ -224,6 +224,12 @@ auto S1C88::instructionLD_rr_rr(n16& dst, n16& src) -> void {
   dst = src;
 }
 
+auto S1C88::instructionOR_irr_r(n16& index, n8& page, n8& src) -> void {
+  n24 address = page << 16 | index;
+  n8 dst = read(address);
+  write(address, OR(dst, src));
+}
+
 auto S1C88::instructionOR_ir_n() -> void {
   n24 address = EP << 16 | BR << 8 | fetch();
   n8 x = read(address);
@@ -233,6 +239,14 @@ auto S1C88::instructionOR_ir_n() -> void {
 
 auto S1C88::instructionNOP() -> void {
   //no operation
+}
+
+auto S1C88::instructionPOP_all() -> void {
+  BR = pop();
+  IY = pop16();
+  IX = pop16();
+  HL = pop16();
+  BA = pop16();
 }
 
 auto S1C88::instructionPOP_r(n8& dst) -> void {
@@ -287,6 +301,18 @@ auto S1C88::instructionSRA_r(n8& dst) -> void {
 
 auto S1C88::instructionSRL_r(n8& dst) -> void {
   dst = SRL(dst);
+}
+
+auto S1C88::instructionSUB_r_r(n8& dst, n8& src) -> void {
+  dst = SUB(dst, src);
+}
+
+auto S1C88::instructionSUB_rr_nn(n16& dst) -> void {
+  dst = SUB16(dst, fetch16());
+}
+
+auto S1C88::instructionSUB_rr_rr(n16& dst, n16& src) -> void {
+  dst = SUB16(dst, src);
 }
 
 auto S1C88::instructionXOR_r_r(n8& dst, n8& src) -> void {
