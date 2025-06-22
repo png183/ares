@@ -13,3 +13,8 @@
 #define CF SC.bit(1)
 #define VF SC.bit(2)
 #define NF SC.bit(3)
+
+#define F0 CC.bit(0)
+#define F1 CC.bit(1)
+#define F2 CC.bit(2)
+#define F3 CC.bit(3)

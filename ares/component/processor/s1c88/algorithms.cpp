@@ -54,6 +54,15 @@ auto S1C88::INC16(n16 x) -> n16 {
   return x;
 }
 
+auto S1C88::MLT(n8 x, n8 y) -> n16 {
+  n16 z = x * y;
+  ZF = z == 0;
+  CF = 0;
+  VF = 0;
+  NF = z.bit(7);
+  return z;
+}
+
 auto S1C88::OR(n8 x, n8 y) -> n8 {
   n8 z = x | y;
   ZF = z == 0;
@@ -87,6 +96,10 @@ auto S1C88::RRC(n8 x) -> n8 {
   ZF = x == 0;
   NF = x.bit(7);
   return x;
+}
+
+auto S1C88::SEP(n8 x) -> n16 {
+  return (i8)x;
 }
 
 auto S1C88::SLL(n8 x) -> n8 {
