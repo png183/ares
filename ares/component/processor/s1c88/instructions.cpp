@@ -1,8 +1,19 @@
+auto S1C88::instructionADC_rr_nn(n16& dst) -> void {
+  dst = ADD16(dst, fetch16(), CF);
+}
+
 auto S1C88::instructionADD_irr_n(n16& index, n8& page) -> void {
   n24 address = page << 16 | index;
   n8 x = read(address);
   n8 y = fetch();
   write(address, ADD(x, y));
+}
+
+auto S1C88::instructionADD_r_irrpn(n8& dst, n16& index, n8& page) -> void {
+  //todo: may have a page wrapping bug?
+  s8 offset = fetch();
+  n24 address = page << 16 | (index + offset);
+  dst = ADD(dst, read(address));
 }
 
 auto S1C88::instructionADD_r_n(n8& dst) -> void {
@@ -123,6 +134,13 @@ auto S1C88::instructionEX_r_r(n8& dst, n8& src) -> void {
   src = tmp;
 }
 
+auto S1C88::instructionEX_r_irr(n8& dst, n16& index, n8& page) -> void {
+  n24 address = page << 16 | index;
+  n8 tmp = dst;
+  dst = read(address);
+  write(address, tmp);
+}
+
 auto S1C88::instructionEX_rr_rr(n16& dst, n16& src) -> void {
   n16 tmp = dst;
   dst = src;
@@ -216,6 +234,13 @@ auto S1C88::instructionLD_irrpn_r(n16& index, n8& page, n8& src) -> void {
   s8 offset = fetch();
   n24 address = page << 16 | (index + offset);
   write(address, src);
+}
+
+auto S1C88::instructionLD_irrpn_rr(n16& index, n8& page, n16& src) -> void {
+  //todo: may have a page wrapping bug?
+  s8 offset = fetch();
+  n24 address = page << 16 | (index + offset);
+  write16(address, src);
 }
 
 auto S1C88::instructionLD_irrpr_r(n16& index, n8& page, n8& dst, n8& src) -> void {
@@ -381,6 +406,13 @@ auto S1C88::instructionRET() -> void {
   NB = CB;
 }
 
+auto S1C88::instructionRL_irr(n16& index, n8& page) -> void {
+  n24 address = page << 16 | index;
+  n8 data = read(address);
+  data = RL(data);
+  write(address, data);
+}
+
 auto S1C88::instructionRL_r(n8& dst) -> void {
   dst = RL(dst);
 }
@@ -391,6 +423,10 @@ auto S1C88::instructionRLC_r(n8& dst) -> void {
 
 auto S1C88::instructionRRC_r(n8& dst) -> void {
   dst = RRC(dst);
+}
+
+auto S1C88::instructionSBC_rr_rr(n16& dst, n16& src) -> void {
+  dst = SUB16(dst, src, CF);
 }
 
 auto S1C88::instructionSEP() -> void {

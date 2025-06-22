@@ -191,6 +191,7 @@ auto S1C88::disassembleInstruction(n8 opcode) -> string {
   op(0xca, "ex", "BA", "IY");
   op(0xcb, "ex", "BA", "SP");
   op(0xcc, "ex", "A", "B");
+  op(0xcd, "ex", "A", "[HL]");
   op(0xd0, "sub", "BA", nn);
   op(0xd1, "sub", "HL", nn);
   op(0xd2, "sub", "IX", nn);
@@ -227,6 +228,8 @@ auto S1C88::disassembleInstructionCE(n8 opcode) -> string {
   string nn = {"[", hex(disassembleFetch(PC + 2) | disassembleFetch(PC + 3) << 8, 4L), "]"};
   string BRn = {"[BR:", hex(disassembleFetch(PC + 2), 2L), "]"};
   switch(opcode) {
+  op(0x00, "add", "A", "IX", n);
+  op(0x01, "add", "A", "IY", n);
   op(0x05, "add", "[HL]", n);
   op(0x20, "and", "A", "IX", n);
   op(0x21, "and", "A", "IY", n);
@@ -274,6 +277,7 @@ auto S1C88::disassembleInstructionCE(n8 opcode) -> string {
   op(0x8d, "srl", "B");
   op(0x90, "rl", "A");
   op(0x91, "rl", "B");
+  op(0x93, "rl", "[HL]");
   op(0x94, "rlc", "A");
   op(0x95, "rlc", "B");
   op(0x9c, "rrc", "A");
@@ -355,6 +359,10 @@ auto S1C88::disassembleInstructionCF(n8 opcode) -> string {
   op(0x09, "sub", "BA", "HL");
   op(0x0a, "sub", "BA", "IX");
   op(0x0b, "sub", "BA", "IY");
+  op(0x0c, "sbc", "BA", "BA");
+  op(0x0d, "sbc", "BA", "HL");
+  op(0x0e, "sbc", "BA", "IX");
+  op(0x0f, "sbc", "BA", "IY");
   op(0x18, "cp", "BA", "BA");
   op(0x19, "cp", "BA", "HL");
   op(0x1a, "cp", "BA", "IX");
@@ -367,6 +375,10 @@ auto S1C88::disassembleInstructionCF(n8 opcode) -> string {
   op(0x29, "sub", "HL", "HL");
   op(0x2a, "sub", "HL", "IX");
   op(0x2b, "sub", "HL", "IY");
+  op(0x2c, "sbc", "HL", "BA");
+  op(0x2d, "sbc", "HL", "HL");
+  op(0x2e, "sbc", "HL", "IX");
+  op(0x2f, "sbc", "HL", "IY");
   op(0x38, "cp", "HL", "BA");
   op(0x39, "cp", "HL", "HL");
   op(0x3a, "cp", "HL", "IX");
@@ -385,6 +397,8 @@ auto S1C88::disassembleInstructionCF(n8 opcode) -> string {
   op(0x4d, "sub", "SP", "HL");
   op(0x5c, "cp", "SP", "BA");
   op(0x5d, "cp", "SP", "HL");
+  op(0x60, "adc", "BA", nn);
+  op(0x61, "adc", "HL", nn);
   op(0x68, "add", "SP", nn);
   op(0x6a, "sub", "SP", nn);
   op(0x6c, "cp", "SP", nn);
@@ -393,6 +407,10 @@ auto S1C88::disassembleInstructionCF(n8 opcode) -> string {
   op(0x71, "ld", "HL", "SP", n);
   op(0x72, "ld", "IX", "SP", n);
   op(0x73, "ld", "IY", "SP", n);
+  op(0x74, "ld", "SP", n, "BA");
+  op(0x75, "ld", "SP", n, "HL");
+  op(0x76, "ld", "SP", n, "IX");
+  op(0x77, "ld", "SP", n, "IY");
   op(0xb0, "push", "A");
   op(0xb1, "push", "B");
   op(0xb2, "push", "L");

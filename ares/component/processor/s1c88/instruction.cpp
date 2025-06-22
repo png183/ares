@@ -181,7 +181,7 @@ auto S1C88::instruction(n8 opcode) -> void {
   op(0xca, EX_rr_rr, BA, IY);
   op(0xcb, EX_rr_rr, BA, SP);
   op(0xcc, EX_r_r, A, B);
-  //todo: cd
+  op(0xcd, EX_r_irr, A, HL, EP);
   //ce and cf are prefixes
   op(0xd0, SUB_rr_nn, BA);
   op(0xd1, SUB_rr_nn, HL);
@@ -223,7 +223,9 @@ auto S1C88::instruction(n8 opcode) -> void {
 
 auto S1C88::instructionCE(n8 opcode) -> void {
   switch(opcode) {
-  //todo: 00-04
+  op(0x00, ADD_r_irrpn, A, IX, XP);
+  op(0x01, ADD_r_irrpn, A, IY, YP);
+  //todo: 02-04
   op(0x05, ADD_irr_n, HL, EP);
   //todo: 06-1f
   op(0x20, AND_r_irrpn, A, IX, XP);
@@ -268,7 +270,13 @@ auto S1C88::instructionCE(n8 opcode) -> void {
   op(0x5d, LD_irrpn_r, IY, YP, H);
   op(0x5e, LD_irrpr_r, IX, XP, L, H);
   op(0x5f, LD_irrpr_r, IY, YP, L, H);
-  //todo: 60-83
+  //todo: 60-63
+  //64-67 is UNDEFINED
+  //todo: 68-6b
+  //6c-77 is UNDEFINED
+  //todo: 78-7b
+  //7c-7f is UNDEFINED
+  //todo: 80-83
   op(0x84, SLL_r, A);
   op(0x85, SLL_r, B);
   //todo: 86-87
@@ -280,7 +288,8 @@ auto S1C88::instructionCE(n8 opcode) -> void {
   //todo: 8e-9f
   op(0x90, RL_r, A);
   op(0x91, RL_r, B);
-  //todo: 92-93
+  //todo: 92
+  op(0x93, RL_irr, HL, EP);
   op(0x94, RLC_r, A);
   op(0x95, RLC_r, B);
   //todo: 96-9b
@@ -371,7 +380,10 @@ auto S1C88::instructionCF(n8 opcode) -> void {
   op(0x09, SUB_rr_rr, BA, HL);
   op(0x0a, SUB_rr_rr, BA, IX);
   op(0x0b, SUB_rr_rr, BA, IY);
-  //todo: 0c-0f
+  op(0x0c, SBC_rr_rr, BA, BA);
+  op(0x0d, SBC_rr_rr, BA, HL);
+  op(0x0e, SBC_rr_rr, BA, IX);
+  op(0x0f, SBC_rr_rr, BA, IY);
   //10-17 is UNDEFINED
   op(0x18, CP_rr_rr, BA, BA);
   op(0x19, CP_rr_rr, BA, HL);
@@ -387,7 +399,10 @@ auto S1C88::instructionCF(n8 opcode) -> void {
   op(0x29, SUB_rr_rr, HL, HL);
   op(0x2a, SUB_rr_rr, HL, IX);
   op(0x2b, SUB_rr_rr, HL, IY);
-  //todo: 2c-2f
+  op(0x2c, SBC_rr_rr, HL, BA);
+  op(0x2d, SBC_rr_rr, HL, HL);
+  op(0x2e, SBC_rr_rr, HL, IX);
+  op(0x2f, SBC_rr_rr, HL, IY);
   //30-37 is UNDEFINED
   op(0x38, CP_rr_rr, HL, BA);
   op(0x39, CP_rr_rr, HL, HL);
@@ -411,7 +426,9 @@ auto S1C88::instructionCF(n8 opcode) -> void {
   op(0x5c, CP_rr_rr, SP, BA);
   op(0x5d, CP_rr_rr, SP, HL);
   //5e-5f is UNDEFINED
-  //todo: 60-63
+  op(0x60, ADC_rr_nn, BA);
+  op(0x61, ADC_rr_nn, HL);
+  //todo: 62-63
   //64-67 is UNDEFINED
   op(0x68, ADD_rr_nn, SP);
   //69 is UNDEFINED
@@ -425,7 +442,13 @@ auto S1C88::instructionCF(n8 opcode) -> void {
   op(0x71, LD_rr_irrpn, HL, SP, SPP);
   op(0x72, LD_rr_irrpn, IX, SP, SPP);
   op(0x73, LD_rr_irrpn, IY, SP, SPP);
-  //todo: 74-7c
+  op(0x74, LD_irrpn_rr, SP, SPP, BA);
+  op(0x75, LD_irrpn_rr, SP, SPP, HL);
+  op(0x76, LD_irrpn_rr, SP, SPP, IX);
+  op(0x77, LD_irrpn_rr, SP, SPP, IY);
+  //todo: 78
+  //79-7b is UNDEFINED
+  //todo: 7c
   //7d-af is UNDEFINED
   op(0xb0, PUSH_r, A);
   op(0xb1, PUSH_r, B);

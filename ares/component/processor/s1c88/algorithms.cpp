@@ -1,4 +1,4 @@
-auto S1C88::ADD(n8 x, n8 y) -> n8 {
+auto S1C88::ADD(n8 x, n8 y, bool c) -> n8 {
   n9 z = x + y;
   ZF = n8(z) == 0;
   CF = z.bit(8);
@@ -7,8 +7,8 @@ auto S1C88::ADD(n8 x, n8 y) -> n8 {
   return z;
 }
 
-auto S1C88::ADD16(n16 x, n16 y) -> n16 {
-  n17 z = x + y;
+auto S1C88::ADD16(n16 x, n16 y, bool c) -> n16 {
+  n17 z = x + y + c;
   ZF = n16(z) == 0;
   CF = z.bit(16);
   VF = n16(~(x ^ y) & (x ^ z)).bit(15);
@@ -127,8 +127,8 @@ auto S1C88::SRL(n8 x) -> n8 {
   return x;
 }
 
-auto S1C88::SUB(n8 x, n8 y) -> n8 {
-  n9 z = x - y;
+auto S1C88::SUB(n8 x, n8 y, bool c) -> n8 {
+  n9 z = x - y - c;
   ZF = n8(z) == 0;
   CF = z.bit(8);
   VF = n8((x ^ y) & (x ^ z)).bit(7);
@@ -136,8 +136,8 @@ auto S1C88::SUB(n8 x, n8 y) -> n8 {
   return z;
 }
 
-auto S1C88::SUB16(n16 x, n16 y) -> n16 {
-  n17 z = x - y;
+auto S1C88::SUB16(n16 x, n16 y, bool c) -> n16 {
+  n17 z = x - y - c;
   ZF = n16(z) == 0;
   CF = z.bit(16);
   VF = n16((x ^ y) & (x ^ z)).bit(15);

@@ -11,8 +11,10 @@ namespace ares {
 #include "memory.cpp"
 
 auto S1C88::power() -> void {
-  NB = 0x01;  //todo: confirm this is correct power-on state?
+  NB = 0x01;
   CB = 0x01;
+  PC = read16(0x000000);
+  SC = 0xc0;
 }
 
 }
