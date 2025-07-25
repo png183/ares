@@ -104,12 +104,12 @@ auto ARM7TDMI::armInstructionDataRegisterShift
 
 auto ARM7TDMI::armInstructionMemorySwap
 (n4 m, n4 d, n4 n, n1 byte) -> void {
-  n32 rm = r(m) + (m == 15 ? 4 : 0);
   lock();
   n32 word = load((byte ? Byte : Word), r(n));
-  store((byte ? Byte : Word), r(n), rm);
-  r(d) = word;
+  store((byte ? Byte : Word), r(n), r(m) + (m == 15 ? 4 : 0));
   unlock();
+  idle();
+  r(d) = word;
 }
 
 auto ARM7TDMI::armInstructionMoveHalfImmediate
@@ -123,7 +123,10 @@ auto ARM7TDMI::armInstructionMoveHalfImmediate
   if(pre == 0) rn = up ? rn + immediate : rn - immediate;
 
   if(pre == 0 || writeback) r(n) = rn + (n == 15 ? 4 : 0);
-  if(mode == 1) r(d) = rd;
+  if(mode == 1) {
+    idle();
+    r(d) = rd;
+  }
 }
 
 auto ARM7TDMI::armInstructionMoveHalfRegister
@@ -138,7 +141,10 @@ auto ARM7TDMI::armInstructionMoveHalfRegister
   if(pre == 0) rn = up ? rn + rm : rn - rm;
 
   if(pre == 0 || writeback) r(n) = rn + (n == 15 ? 4 : 0);
-  if(mode == 1) r(d) = rd;
+  if(mode == 1) {
+    idle();
+    r(d) = rd;
+  }
 }
 
 auto ARM7TDMI::armInstructionMoveImmediateOffset
@@ -152,7 +158,10 @@ auto ARM7TDMI::armInstructionMoveImmediateOffset
   if(pre == 0) rn = up ? rn + immediate : rn - immediate;
 
   if(pre == 0 || writeback) r(n) = rn;
-  if(mode == 1) r(d) = rd;
+  if(mode == 1) {
+    idle();
+    r(d) = rd;
+  }
 }
 
 auto ARM7TDMI::armInstructionMoveMultiple
@@ -176,28 +185,15 @@ auto ARM7TDMI::armInstructionMoveMultiple
   if(writeback && mode == 1 && !list.bit(n)) r(n) = rnEnd;
 
   endBurst();
-  if(!list) {
-    if(mode == 1) r(15) = read(Word, rn);
+  if(!list) list.bit(15) = 1;
+  for(u32 m : range(16)) {
+    if(!list.bit(m)) continue;
+    if(mode == 1) r(m) = read(Word, rn);
     if(mode == 0) {
-      write(Word, rn, r(15) + 4);
-      //writeback occurs after first access
-      if(writeback) r(n) = rnEnd;
+      write(Word, rn, r(m) + (!(n == 15 && writeback) && m == 15 ? 4 : 0));
+      if(writeback) r(n) = rnEnd;  //writeback occurs after first access
     }
-  } else {
-    bool wroteBack = false;
-    for(u32 m : range(16)) {
-      if(!list.bit(m)) continue;
-      if(mode == 1) r(m) = read(Word, rn);
-      if(mode == 0) {
-        write(Word, rn, r(m) + (!(n == 15 && writeback) && m == 15 ? 4 : 0));
-        if(!wroteBack && writeback) {
-          //writeback occurs after first access
-          r(n) = rnEnd;
-          wroteBack = true;
-        }
-      }
-      rn += 4;
-    }
+    rn += 4;
   }
 
   if(usr) cpsr().m = cpsrMode;
@@ -232,7 +228,10 @@ auto ARM7TDMI::armInstructionMoveRegisterOffset
   if(pre == 0) rn = up ? rn + rm : rn - rm;
 
   if(pre == 0 || writeback) r(n) = rn;
-  if(mode == 1) r(d) = rd;
+  if(mode == 1) {
+    idle();
+    r(d) = rd;
+  }
 }
 
 auto ARM7TDMI::armInstructionMoveSignedImmediate
@@ -246,7 +245,10 @@ auto ARM7TDMI::armInstructionMoveSignedImmediate
   if(pre == 0) rn = up ? rn + immediate : rn - immediate;
 
   if(pre == 0 || writeback) r(n) = rn + (n == 15 ? 4 : 0);
-  if(mode == 1) r(d) = rd;
+  if(mode == 1) {
+    idle();
+    r(d) = rd;
+  }
 }
 
 auto ARM7TDMI::armInstructionMoveSignedRegister
@@ -261,7 +263,10 @@ auto ARM7TDMI::armInstructionMoveSignedRegister
   if(pre == 0) rn = up ? rn + rm : rn - rm;
 
   if(pre == 0 || writeback) r(n) = rn + (n == 15 ? 4 : 0);
-  if(mode == 1) r(d) = rd;
+  if(mode == 1) {
+    idle();
+    r(d) = rd;
+  }
 }
 
 auto ARM7TDMI::armInstructionMoveToCoprocessorFromRegister

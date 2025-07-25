@@ -12,11 +12,11 @@ jobs:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       with:
         path: 'src'
     - name: Download Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
       with:
         path: 'bin'
     - name: "Decompress Build Artifacts"
@@ -73,6 +73,7 @@ jobs:
         name: ares ${{ steps.check.outputs.versionName }}
         body: ${{ steps.check.outputs.description }}
         files: |
+          ${{ github.workspace }}/ares-source.tar.gz
           ${{ github.workspace }}/ares-macos-universal.zip
           ${{ github.workspace }}/ares-macos-universal-dSYMs.zip
           ${{ github.workspace }}/ares-windows-x64.zip

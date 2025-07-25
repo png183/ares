@@ -106,13 +106,14 @@ auto ARM7TDMI::thumbInstructionLoadLiteral
 (n8 displacement, n3 d) -> void {
   n32 address = (r(15) & ~3) + (displacement << 2);
   r(d) = load(Word, address);
+  idle();
 }
 
 auto ARM7TDMI::thumbInstructionMoveByteImmediate
 (n3 d, n3 n, n5 offset, n1 mode) -> void {
   switch(mode) {
   case 0: store(Byte, r(n) + offset, r(d)); break;  //STRB
-  case 1: r(d) = load(Byte, r(n) + offset); break;  //LDRB
+  case 1: r(d) = load(Byte, r(n) + offset); idle(); break;  //LDRB
   }
 }
 
@@ -120,41 +121,29 @@ auto ARM7TDMI::thumbInstructionMoveHalfImmediate
 (n3 d, n3 n, n5 offset, n1 mode) -> void {
   switch(mode) {
   case 0: store(Half, r(n) + offset * 2, r(d)); break;  //STRH
-  case 1: r(d) = load(Half, r(n) + offset * 2); break;  //LDRH
+  case 1: r(d) = load(Half, r(n) + offset * 2); idle(); break;  //LDRH
   }
 }
 
 auto ARM7TDMI::thumbInstructionMoveMultiple
 (n8 list, n3 n, n1 mode) -> void {
   n32 rn = r(n);
-  n32 bitCount = list ? bit::count(list) : 16;
+  n16 rlist = list;
+  n32 bitCount = rlist ? bit::count(rlist) : 16;
   n32 rnEnd = r(n) + bitCount * 4;
 
-  if(mode == 1 && !list.bit(n)) r(n) = rnEnd;
+  if(mode == 1 && !rlist.bit(n)) r(n) = rnEnd;
 
   endBurst();
-  if(!list) {
-    if(mode == 1) r(15) = read(Word, rn);
+  if(!rlist) rlist.bit(15) = 1;
+  for(u32 m : range(16)) {
+    if(!rlist.bit(m)) continue;
+    if(mode == 1) r(m) = read(Word, rn);  //LDMIA
     if(mode == 0) {
-      write(Word, rn, r(15) + 2);
-      //writeback occurs after first access
-      r(n) = rnEnd;
+      write(Word, rn, r(m) + (m == 15 ? 2 : 0));  //STMIA
+      r(n) = rnEnd;  //writeback occurs after first access
     }
-  } else {
-    bool wroteBack = false;
-    for(u32 m : range(8)) {
-      if(!list.bit(m)) continue;
-      if(mode == 1) r(m) = read(Word, rn);  //LDMIA
-      if(mode == 0) {
-        write(Word, rn, r(m));  //STMIA
-        //writeback occurs after first access
-        if(!wroteBack) {
-          r(n) = rnEnd;
-          wroteBack = true;
-        }
-      }
-      rn += 4;
-    }
+    rn += 4;
   }
 
   if(mode) {
@@ -170,11 +159,11 @@ auto ARM7TDMI::thumbInstructionMoveRegisterOffset
   case 0: store(Word, r(n) + r(m), r(d)); break;  //STR
   case 1: store(Half, r(n) + r(m), r(d)); break;  //STRH
   case 2: store(Byte, r(n) + r(m), r(d)); break;  //STRB
-  case 3: r(d) = load(Byte | Signed, r(n) + r(m)); break;  //LDSB
-  case 4: r(d) = load(Word, r(n) + r(m)); break;  //LDR
-  case 5: r(d) = load(Half, r(n) + r(m)); break;  //LDRH
-  case 6: r(d) = load(Byte, r(n) + r(m)); break;  //LDRB
-  case 7: r(d) = load(Half | Signed, r(n) + r(m)); break;  //LDSH
+  case 3: r(d) = load(Byte | Signed, r(n) + r(m)); idle(); break;  //LDSB
+  case 4: r(d) = load(Word, r(n) + r(m)); idle(); break;  //LDR
+  case 5: r(d) = load(Half, r(n) + r(m)); idle(); break;  //LDRH
+  case 6: r(d) = load(Byte, r(n) + r(m)); idle(); break;  //LDRB
+  case 7: r(d) = load(Half | Signed, r(n) + r(m)); idle(); break;  //LDSH
   }
 }
 
@@ -182,7 +171,7 @@ auto ARM7TDMI::thumbInstructionMoveStack
 (n8 immediate, n3 d, n1 mode) -> void {
   switch(mode) {
   case 0: store(Word, r(13) + immediate * 4, r(d)); break;  //STR
-  case 1: r(d) = load(Word, r(13) + immediate * 4); break;  //LDR
+  case 1: r(d) = load(Word, r(13) + immediate * 4); idle(); break;  //LDR
   }
 }
 
@@ -190,7 +179,7 @@ auto ARM7TDMI::thumbInstructionMoveWordImmediate
 (n3 d, n3 n, n5 offset, n1 mode) -> void {
   switch(mode) {
   case 0: store(Word, r(n) + offset * 4, r(d)); break;  //STR
-  case 1: r(d) = load(Word, r(n) + offset * 4); break;  //LDR
+  case 1: r(d) = load(Word, r(n) + offset * 4); idle(); break;  //LDR
   }
 }
 
@@ -211,25 +200,21 @@ auto ARM7TDMI::thumbInstructionSoftwareInterrupt
 auto ARM7TDMI::thumbInstructionStackMultiple
 (n8 list, n1 lrpc, n1 mode) -> void {
   n32 sp = r(13);
-  n32 bitCount = (list | lrpc) ? (bit::count(list) + lrpc) : 16;
+  n16 rlist = list;
+  if(lrpc) {
+    if(mode == 1) rlist.bit(15) = 1;  //POP
+    if(mode == 0) rlist.bit(14) = 1;  //PUSH
+  }
+  n32 bitCount = rlist ? bit::count(rlist) : 16;
   if(mode == 1) r(13) = r(13) + bitCount * 4;  //POP
   if(mode == 0) sp = sp - bitCount * 4 + 0;    //PUSH
 
   endBurst();
-  if(bitCount == 16) {
-    if(mode == 1) r(15) = read(Word, sp);      //POP
-    if(mode == 0) write(Word, sp, r(15) + 2);  //PUSH
-  } else {
-    for(u32 m : range(8)) {
-      if(!list.bit(m)) continue;
-      if(mode == 1) r(m) = read(Word, sp);  //POP
-      if(mode == 0) write(Word, sp, r(m));  //PUSH
-      sp += 4;
-    }
-  }
-  if(lrpc) {
-    if(mode == 1) r(15) = read(Word, sp);  //POP
-    if(mode == 0) write(Word, sp, r(14));  //PUSH
+  if(!rlist) rlist.bit(15) = 1;
+  for(u32 m : range(16)) {
+    if(!rlist.bit(m)) continue;
+    if(mode == 1) r(m) = read(Word, sp);  //POP
+    if(mode == 0) write(Word, sp, r(m) + (m == 15 ? 2 : 0));  //PUSH
     sp += 4;
   }
 

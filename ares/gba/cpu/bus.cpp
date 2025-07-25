@@ -48,11 +48,16 @@ inline auto CPU::getBus(u32 mode, n32 address) -> n32 {
     mode = cartMode(mode, address);
     context.romAccess = true;
     if(mode & Prefetch && wait.prefetch) {
-      if(mode & Nonsequential && prefetch.cycle == 0 && prefetch.empty()) prefetchReset();
-      prefetchSync(address);
-      prefetchStep(1);
-      word = prefetchRead();
-      if(mode & Word) word |= prefetchRead() << 16;
+      if(address == prefetch.addr && (!prefetch.empty() || prefetch.ahead)) {
+        prefetchStepInternal(1);
+        word = prefetchRead();
+        if(mode & Word) word |= prefetchRead() << 16;
+      } else {
+        if(mode & Word) address &= ~3;  //prevents misaligned PC from reading incorrect values
+        prefetchSync(mode, address);
+        step(waitCartridge(mode, address));
+        word = cartridge.readRom<false>(mode, address);
+      }
     } else {
       if(context.dmaActive) context.dmaRomAccess = true;
       prefetchReset();
